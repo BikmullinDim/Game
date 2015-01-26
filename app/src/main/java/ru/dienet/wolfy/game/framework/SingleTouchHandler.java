@@ -11,14 +11,14 @@ import ru.dienet.wolfy.game.framework.interfaces.Input.TouchEvent;
 
 public class SingleTouchHandler implements TouchHandler {
 
-	boolean isTouched;
-	int touchX;
-	int touchY;
-	Pool<TouchEvent> touchEventPool;
-	List<TouchEvent> touchEvents = new ArrayList<TouchEvent>();
-	List<TouchEvent> touchEventsBuffer = new ArrayList<TouchEvent>();
-	float scaleX;
-	float scaleY;
+	private boolean isTouched;
+	private int touchX;
+	private int touchY;
+	protected Pool<TouchEvent> touchEventPool;
+	protected List<TouchEvent> touchEvents = new ArrayList<>();
+	protected List<TouchEvent> touchEventsBuffer = new ArrayList<>();
+	protected float scaleX;
+	protected float scaleY;
 
 	public SingleTouchHandler( View view, float scaleX, float scaleY ) {
 		Pool.PoolObjectsFactory<TouchEvent> touchEventPoolObjectsFactory = new Pool.PoolObjectsFactory<TouchEvent>() {

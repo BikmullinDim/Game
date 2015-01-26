@@ -112,13 +112,13 @@ public class AndroidGraphics implements Graphics {
 		dstRect.right = x + srcWidth;
 		dstRect.bottom = y + srcHeight;
 
-		canvas.drawBitmap( ((AndroidImage) Image).bitmap, srcRect, dstRect,
+		canvas.drawBitmap( ((AndroidImage) image).getBitmap(), srcRect, dstRect,
 				null );
 	}
 
 	@Override
-	public void drawImage( Image Image, int x, int y ) {
-		canvas.drawBitmap( ((AndroidImage) Image).bitmap, x, y, null );
+	public void drawImage( Image image, int x, int y ) {
+		canvas.drawBitmap( ((AndroidImage) image).getBitmap(), x, y, null );
 	}
 
 	@Override
@@ -126,7 +126,7 @@ public class AndroidGraphics implements Graphics {
 		canvas.drawText( text, x, y, paint );
 	}
 
-	public void drawScaledImage( Image Image, int x, int y, int width, int height, int srcX, int srcY, int srcWidth, int srcHeight ) {
+	public void drawScaledImage( Image image, int x, int y, int width, int height, int srcX, int srcY, int srcWidth, int srcHeight ) {
 
 
 		srcRect.left = srcX;
@@ -140,7 +140,7 @@ public class AndroidGraphics implements Graphics {
 		dstRect.right = x + width;
 		dstRect.bottom = y + height;
 
-		canvas.drawBitmap( ((AndroidImage) Image).bitmap, srcRect, dstRect, null );
+		canvas.drawBitmap( ((AndroidImage) image).getBitmap(), srcRect, dstRect, null );
 
 	}
 
