@@ -10,6 +10,7 @@ import android.os.PowerManager;
 import android.view.Window;
 import android.view.WindowManager;
 
+import ru.dienet.wolfy.game.R;
 import ru.dienet.wolfy.game.framework.interfaces.Audio;
 import ru.dienet.wolfy.game.framework.interfaces.FileIO;
 import ru.dienet.wolfy.game.framework.interfaces.Game;
@@ -39,8 +40,10 @@ public abstract class AndroidGame extends Activity implements Game {
 		getWindow().getWindowManager().getDefaultDisplay().getSize( windowSize );
 		/*int frameBufferWidth = isPortrait ? windowSize.x: windowSize.y;
 		int frameBufferHeight = isPortrait ? windowSize.y: windowSize.x;*/
-		int frameBufferWidth = isPortrait ? 800: 1280;
-		int frameBufferHeight = isPortrait ? 1280: 800;
+		int defHeight =getResources().getInteger( R.integer.stageHeight );
+		int defWidth =getResources().getInteger( R.integer.stageWidth );
+		int frameBufferWidth = isPortrait ? defHeight: defWidth;
+		int frameBufferHeight = isPortrait ? defWidth: defHeight;
 
 		float scaleY = ( float )frameBufferWidth/windowSize.y;
 		float scaleX = ( float )frameBufferWidth/windowSize.x;
