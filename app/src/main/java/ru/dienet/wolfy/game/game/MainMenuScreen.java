@@ -23,17 +23,13 @@ public class MainMenuScreen extends Screen {
 		for ( int i = 0; i < length; i++ ) {
 			touchEvent = touchEvents.get( i );
 			if (touchEvent.type == TouchEvent.TOUCH_UP ){
-				if( inBounds( touchEvent, 0,0, 250,250 ) ){
+				if(Utils.inBounds( touchEvent, 50, 350, 250, 450 ) ){
 					game.setScreen( new GameScreen( game ) );
 				}
 			}
 		}
 	}
 
-	private boolean inBounds( TouchEvent touchEvent, int x, int y, int width, int height ) {
-		return (touchEvent.x > x) && (touchEvent.x < x + width - 1) &&
-				(touchEvent.y > y) && (touchEvent.y < y + height - 1);
-	}
 
 	@Override
 	public void paint( float deltaTime ) {
@@ -59,5 +55,6 @@ public class MainMenuScreen extends Screen {
 	@Override
 	public void backButton() {
 		//Display "Exit Game?" dialog
+		android.os.Process.killProcess( android.os.Process.myPid() );
 	}
 }

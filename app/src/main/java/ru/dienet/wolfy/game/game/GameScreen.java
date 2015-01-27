@@ -3,11 +3,15 @@ package ru.dienet.wolfy.game.game;
 import android.graphics.Color;
 import android.graphics.Paint;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ru.dienet.wolfy.game.framework.Screen;
 import ru.dienet.wolfy.game.framework.interfaces.Game;
 import ru.dienet.wolfy.game.framework.interfaces.Graphics;
+import ru.dienet.wolfy.game.framework.interfaces.Image;
+import ru.dienet.wolfy.game.game.gameObjects.Animation;
+import ru.dienet.wolfy.game.game.gameObjects.Background;
 
 import static ru.dienet.wolfy.game.framework.interfaces.Input.TouchEvent;
 
@@ -23,10 +27,54 @@ public class GameScreen extends Screen {
 	int livesLeft = 1;
 
 
+	private static Background bg1, bg2;
+	private static Robot robot;
+	public static Heliboy hb, hb2;
+
+	private Image currentSprite, character, character2, character3, heliboy,
+			heliboy2, heliboy3, heliboy4, heliboy5;
+	private Animation anim, hanim;
+
+	private ArrayList tilearray = new ArrayList();
+	private Paint paint2;
+
 	public GameScreen( Game game ) {
 		super(game);
 
 		//ToDo: init game objects
+		bg1 = new Background(0, 0);
+		bg2 = new Background(2160, 0);
+		robot = new Robot();
+		hb = new Heliboy(340, 360);
+		hb2 = new Heliboy(700, 360);
+
+		character = Assets.character;
+		character2 = Assets.character2;
+		character3 = Assets.character3;
+
+		heliboy = Assets.heliboy;
+		heliboy2 = Assets.heliboy2;
+		heliboy3 = Assets.heliboy3;
+		heliboy4 = Assets.heliboy4;
+		heliboy5 = Assets.heliboy5;
+
+		anim = new Animation();
+		anim.addFrame(character, 1250);
+		anim.addFrame(character2, 50);
+		anim.addFrame(character3, 50);
+		anim.addFrame(character2, 50);
+
+		hanim = new Animation();
+		hanim.addFrame(heliboy, 100);
+		hanim.addFrame(heliboy2, 100);
+		hanim.addFrame(heliboy3, 100);
+		hanim.addFrame(heliboy4, 100);
+		hanim.addFrame(heliboy5, 100);
+		hanim.addFrame(heliboy4, 100);
+		hanim.addFrame(heliboy3, 100);
+		hanim.addFrame(heliboy2, 100);
+
+		currentSprite = anim.getImage();
 
 		paint = new Paint(  );
 		paint.setTextSize( 30 );
@@ -62,7 +110,33 @@ public class GameScreen extends Screen {
 	}
 
 	private void callGameObjectsUpdates() {
+		robot.update();
+		if (robot.isJumped()) {
+			currentSprite = Assets.characterJump;
+		} else if (robot.isJumped() == false && robot.isDucked() == false) {
+			currentSprite = anim.getImage();
+		}
 
+		ArrayList projectiles = robot.getProjectiles();
+		for (int i = 0; i < projectiles.size(); i++) {
+			Projectile p = (Projectile) projectiles.get(i);
+			if (p.isVisible() == true) {
+				p.update();
+			} else {
+				projectiles.remove(i);
+			}
+		}
+
+		updateTiles();
+		hb.update();
+		hb2.update();
+		bg1.update();
+		bg2.update();
+		animate();
+
+		if (robot.getCenterY() > 500) {
+			gameState = GameState.GameOver;
+		}
 	}
 
 	private void checkEvents() {
@@ -85,22 +159,50 @@ public class GameScreen extends Screen {
 	}
 
 	private void touchDown( TouchEvent touchEvent ) {
-		if (touchEvent.x < 640) {
-			// Move left.
+		if (Utils.inBounds( event, 0, 285, 65, 65 )) {
+			robot.jump();
+			currentSprite = anim.getImage();
+			robot.setDucked(false);
 		}
 
-		else if (touchEvent.x > 640) {
+		else if (Utils.inBounds( touchEvent, 0, 350, 65, 65 )) {
+
+			if (robot.isDucked() == false && robot.isJumped() == false
+					&& robot.isReadyToFire()) {
+				robot.shoot();
+			}
+		}
+
+		else if (Utils.inBounds( touchEvent, 0, 415, 65, 65 )
+				&& robot.isJumped() == false) {
+			currentSprite = Assets.characterDown;
+			robot.setDucked(true);
+			robot.setSpeedX(0);
+
+		}
+
+		if (touchEvent.x > 400) {
 			// Move right.
+			robot.moveRight();
+			robot.setMovingRight(true);
+
 		}
 	}
 
 	private void touchUp( TouchEvent touchEvent ) {
-		if (touchEvent.x < 640) {
-			// Stop moving left.
+
+		if (Utils.inBounds( touchEvent, 0, 415, 65, 65 )) {
+			currentSprite = anim.getImage();
+			robot.setDucked(false);
 		}
 
-		else if (touchEvent.x > 640) {
-			// Stop moving right. }
+		if (Utils.inBounds( touchEvent, 0, 0, 35, 35 )) {
+			pause();
+		}
+
+		if (touchEvent.x > 400) {
+			// Move right.
+			robot.stopRight();
 		}
 	}
 
@@ -108,9 +210,8 @@ public class GameScreen extends Screen {
 		int length = touchEvents.size();
 		for (int i = 0; i < length; i++) {
 			TouchEvent touchEvent = touchEvents.get(i);
-			if (touchEvent.type == TouchEvent.TOUCH_UP) {
-				if (touchEvent.x > 300 && touchEvent.x < 980 && touchEvent.y > 100
-						&& touchEvent.y < 500) {
+			if (touchEvent.type == TouchEvent.TOUCH_DOWN) {
+				if (Utils.inBounds( touchEvent, 0, 0, 800, 480 )) {
 					nullify();
 					game.setScreen(new MainMenuScreen(game));
 					return;
@@ -123,6 +224,23 @@ public class GameScreen extends Screen {
 		// Set all variables to null. It will be recreating in the constructor.
 		paint = null;
 
+		bg1 = null;
+		bg2 = null;
+		robot = null;
+		hb = null;
+		hb2 = null;
+		currentSprite = null;
+		character = null;
+		character2 = null;
+		character3 = null;
+		heliboy = null;
+		heliboy2 = null;
+		heliboy3 = null;
+		heliboy4 = null;
+		heliboy5 = null;
+		anim = null;
+		hanim = null;
+
 		// Call garbage collector to clean up memory.
 		System.gc();
 	}
@@ -132,7 +250,16 @@ public class GameScreen extends Screen {
 		for (int i = 0; i < length; i++) {
 			TouchEvent event = touchEvents.get(i);
 			if (event.type == TouchEvent.TOUCH_UP) {
+				if (Utils.inBounds( event, 0, 0, 800, 240 )) {
+					if (!Utils.inBounds( event, 0, 0, 35, 35 )) {
+						resume();
+					}
+				}
 
+				if (Utils.inBounds( event, 0, 240, 800, 240 )) {
+					nullify();
+					goToMenu();
+				}
 			}
 		}
 	}
@@ -143,10 +270,23 @@ public class GameScreen extends Screen {
 
 		// First draw the game elements.
 
-		// Example:
-		// graphics.drawImage(Assets.background, 0, 0);
-		// graphics.drawImage(Assets.character, characterX, characterY);
+		graphics.drawImage(Assets.background, bg1.getBgX(), bg1.getBgY());
+		graphics.drawImage(Assets.background, bg2.getBgX(), bg2.getBgY());
+		paintTiles(graphics);
 
+		ArrayList projectiles = robot.getProjectiles();
+		for (int i = 0; i < projectiles.size(); i++) {
+			Projectile p = (Projectile) projectiles.get(i);
+			graphics.drawRect(p.getX(), p.getY(), 10, 5, Color.YELLOW);
+		}
+		// First draw the game elements.
+
+		graphics.drawImage(currentSprite, robot.getCenterX() - 61,
+				robot.getCenterY() - 63);
+		graphics.drawImage(hanim.getImage(), hb.getCenterX() - 48,
+				hb.getCenterY() - 48);
+		graphics.drawImage(hanim.getImage(), hb2.getCenterX() - 48,
+				hb2.getCenterY() - 48);
 		// Secondly, draw the UI above the game elements.
 		if (gameState == GameState.Ready)
 			drawReadyUI(graphics);
@@ -158,24 +298,44 @@ public class GameScreen extends Screen {
 			drawGameOverUI(graphics);
 	}
 
+	private void paintTiles(Graphics graphics) {
+		for (int i = 0; i < tilearray.size(); i++) {
+			Tile tile = (Tile) tilearray.get(i);
+			if (tile.type != 0) {
+				graphics.drawImage( tile.getTileImage(), tile.getTileX(), tile.getTileY() );
+			}
+		}
+	}
+
+	public void animate() {
+		anim.update(10);
+		hanim.update(50);
+	}
+
 	private void drawGameOverUI( Graphics graphics ) {
 		graphics.drawRect(0, 0, 1281, 801, Color.BLACK);
-		graphics.drawString("GAME OVER.", 640, 300, paint);
+		graphics.drawString( "GAME OVER.", 400, 240, paint2 );
+		graphics.drawString( "Tap to return.", 400, 290, paint );
 	}
 
 	private void drawPausedUI( Graphics graphics ) {
 		// Darken the entire screen, can display the Paused screen.
 		graphics.drawARGB(155, 0, 0, 0);
+
+		graphics.drawString( "Resume", 400, 165, paint2 );
+		graphics.drawString( "Menu", 400, 360, paint2 );
 	}
 
 	private void drawRunningUI( Graphics graphics ) {
-		
+		graphics.drawImage(Assets.button, 0, 285, 0, 0, 65, 65);
+		graphics.drawImage(Assets.button, 0, 350, 0, 65, 65, 65);
+		graphics.drawImage(Assets.button, 0, 415, 0, 130, 65, 65);
+		graphics.drawImage(Assets.button, 0, 0, 0, 195, 35, 35);
 	}
 
 	private void drawReadyUI( Graphics graphics ) {
 		graphics.drawARGB(155, 0, 0, 0);
-		graphics.drawString("Tap each side of the screen to move in that direction.",
-				640, 300, paint);
+		graphics.drawString("Tap to Start.", 400, 240, paint);
 	}
 
 	@Override
@@ -198,4 +358,69 @@ public class GameScreen extends Screen {
 	public void backButton() {
 		pause();
 	}
+
+	private void goToMenu() {
+		game.setScreen(new MainMenuScreen(game));
+	}
+
+	public static Background getBg1() {
+		// TODO Auto-generated method stub
+		return bg1;
+	}
+
+	public static Background getBg2() {
+		// TODO Auto-generated method stub
+		return bg2;
+	}
+
+	public static Robot getRobot() {
+		// TODO Auto-generated method stub
+		return robot;
+	}
+
+	private void loadMap() {
+		ArrayList lines = new ArrayList();
+		int width = 0;
+		int height = 0;
+
+		Scanner scanner = new Scanner(SampleGame.map);
+		while (scanner.hasNextLine()) {
+			String line = scanner.nextLine();
+
+			// no more lines to read
+			if (line == null) {
+				break;
+			}
+
+			if (!line.startsWith("!")) {
+				lines.add(line);
+				width = Math.max(width, line.length());
+
+			}
+		}
+		height = lines.size();
+
+		for (int j = 0; j < 12; j++) {
+			String line = (String) lines.get(j);
+			for (int i = 0; i < width; i++) {
+
+				if (i < line.length()) {
+					char ch = line.charAt(i);
+					Tile t = new Tile(i, j, Character.getNumericValue(ch));
+					tilearray.add(t);
+				}
+
+			}
+		}
+
+	}
+
+	private void updateTiles() {
+		for (int i = 0; i < tilearray.size(); i++) {
+			Tile tile = (Tile) tilearray.get(i);
+			tile.update();
+		}
+
+	}
+
 }
