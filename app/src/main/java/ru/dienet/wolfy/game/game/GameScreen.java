@@ -427,6 +427,7 @@ public class GameScreen extends Screen {
 
 	}
 
+
 	private void updateTiles() {
 		for (int i = 0; i < tilearray.size(); i++) {
 			Tile tile = (Tile) tilearray.get(i);
