@@ -166,6 +166,18 @@ public class GameScreen extends Screen {
 				touchDown( touchEvent );
 			}else if (touchEvent.type == TouchEvent.TOUCH_UP){
 				touchUp(touchEvent);
+			}else if (touchEvent.type == TouchEvent.TOUCH_DRAGGED){
+				touchDrag(touchEvent);
+			}
+		}
+	}
+
+	static int lastdrag;
+	private void touchDrag( TouchEvent touchEvent ) {
+
+		if(touchEvent.x < Utils.HALF_WIDTH){
+			if(touchEvent.y > Utils.HALF_HEIGHT){
+
 			}
 		}
 	}
@@ -358,7 +370,8 @@ public class GameScreen extends Screen {
 
 	@Override
 	public void resume() {
-
+		if (gameState == GameState.Paused)
+			gameState = GameState.Running;
 	}
 
 	@Override
