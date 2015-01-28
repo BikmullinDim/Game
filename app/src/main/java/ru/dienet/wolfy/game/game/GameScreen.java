@@ -5,6 +5,7 @@ import android.graphics.Paint;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 import ru.dienet.wolfy.game.framework.Screen;
 import ru.dienet.wolfy.game.framework.interfaces.Game;
@@ -12,6 +13,10 @@ import ru.dienet.wolfy.game.framework.interfaces.Graphics;
 import ru.dienet.wolfy.game.framework.interfaces.Image;
 import ru.dienet.wolfy.game.game.gameObjects.Animation;
 import ru.dienet.wolfy.game.game.gameObjects.Background;
+import ru.dienet.wolfy.game.game.gameObjects.Heliboy;
+import ru.dienet.wolfy.game.game.gameObjects.Projectile;
+import ru.dienet.wolfy.game.game.gameObjects.Robot;
+import ru.dienet.wolfy.game.game.gameObjects.Tile;
 
 import static ru.dienet.wolfy.game.framework.interfaces.Input.TouchEvent;
 
@@ -75,12 +80,19 @@ public class GameScreen extends Screen {
 		hanim.addFrame(heliboy2, 100);
 
 		currentSprite = anim.getImage();
+		loadMap();
 
 		paint = new Paint(  );
 		paint.setTextSize( 30 );
 		paint.setTextAlign( Paint.Align.CENTER );
 		paint.setAntiAlias( true );
 		paint.setColor( Color.WHITE );
+
+		paint2 = new Paint();
+		paint2.setTextSize(100);
+		paint2.setTextAlign(Paint.Align.CENTER);
+		paint2.setAntiAlias(true);
+		paint2.setColor(Color.GREEN);
 	}
 
 	@Override
@@ -159,7 +171,7 @@ public class GameScreen extends Screen {
 	}
 
 	private void touchDown( TouchEvent touchEvent ) {
-		if (Utils.inBounds( event, 0, 285, 65, 65 )) {
+		if (Utils.inBounds( touchEvent, 0, 285, 65, 65 )) {
 			robot.jump();
 			currentSprite = anim.getImage();
 			robot.setDucked(false);
@@ -383,7 +395,7 @@ public class GameScreen extends Screen {
 		int width = 0;
 		int height = 0;
 
-		Scanner scanner = new Scanner(SampleGame.map);
+		Scanner scanner = new Scanner(GameMain.map);
 		while (scanner.hasNextLine()) {
 			String line = scanner.nextLine();
 

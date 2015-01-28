@@ -45,9 +45,8 @@ public abstract class AndroidGame extends Activity implements Game {
 		int frameBufferWidth = isPortrait ? defHeight: defWidth;
 		int frameBufferHeight = isPortrait ? defWidth: defHeight;
 
-		float scaleY = ( float )frameBufferWidth/windowSize.y;
+		float scaleY = ( float )frameBufferHeight/windowSize.y;
 		float scaleX = ( float )frameBufferWidth/windowSize.x;
-
 		Bitmap frameBuffer = Bitmap.createBitmap( frameBufferWidth, frameBufferHeight, Bitmap.Config.RGB_565 );
 		renderView = new AndroidFastRenderView( this, frameBuffer );
 		graphics = new AndroidGraphics( getAssets(),frameBuffer );
